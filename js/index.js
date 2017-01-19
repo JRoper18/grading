@@ -25,6 +25,7 @@ $('.table-down').click(function() {
 	$row.next().after($row.get(0));
 });
 
+
 // A few jQuery helpers for exporting only
 jQuery.fn.pop = [].pop;
 jQuery.fn.shift = [].shift;
@@ -61,6 +62,12 @@ function getGPA(){
 	}
 	return Math.round(sum / jsonData.length * 100) / 100 //Rounded
 }
+$('#import-btn').fileupload({
+        dataType: 'json',
+        done: function (e, data) {
+            console.log(data);
+        }
+    });
 function getJSON() {
 	var $rows = $TABLE.find('tr:not(:hidden)');
 	var headers = [];
@@ -112,11 +119,45 @@ $(".grade-option").click(function() {
 function rangeRefresh(row, newValue) {
 	row.html(newValue);
 }
-
+function makeRowString(name, grade, honors, ue){
+	return (`
+		<td contenteditable="true">${name}</td>
+		<td>
+			<div class="dropdown">
+				<button class="dropdown-btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					${grade}
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu" aria-labelledby="dLabel">
+					<li><a class = "grade-option" href="#">PP</a></li>
+					<li><a class = "grade-option" href="#">P</a></li>
+					<li><a class = "grade-option" href="#">A</a></li>
+					<li><a class = "grade-option" href="#">HA</a></li>
+				</ul>
+			</div>
+		</td>
+		<td><input type="checkbox" checked="${honors}"/></td>
+		<td>
+			<div class="numValue">
+				${ue}
+			</div>
+			<input type="range" min="0" max="1.5" step="0.5" onchange="rangeRefresh($(this).parent().find('.numValue'), this.value);" />
+		</td>
+		<td>
+			<span class="table-remove glyphicon glyphicon-remove"></span>
+		</td>
+		<td>
+			<span class="table-up glyphicon glyphicon-arrow-up"></span>
+			<span class="table-down glyphicon glyphicon-arrow-down"></span>
+		</td>`);
+}
 function importFromJSON(json){
+	$("trbody").html(" 	"); //Clear the table
 	$("trbody").append("<tr><th>Course Name</th><th>Grade</th><th>Honors</th><th>Units Earned</th><th></th><th></th></tr>"); //Headers
 	for(let i = 0; i<json.length; i++){
-		const courseName = json[i]["course name"];
-		$("trbody").append(`<td contenteditable="true">${courseName}</td>`)
+		$("trbody").append(makeRowString(json[i]["courseName"],json[i]["grade"],json[i]["honors"],json[i]["units earned"]));
 	}
+	//Add the empty row.
+	$("trbody").append(makeRowString("Course Name","Grade",true,1));
+
 }
