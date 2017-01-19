@@ -17,12 +17,14 @@
 </head>
 
 <body>
+  <div id="gpa">
+    <h1 id=gpa-txt></h1>
+  </div>
   <div class="container">
   <h1>Transcript Editor</h1>
   <ul>
-    <li>Click of the fields to edit them</li>
+    <li>Click on the fields to edit them</li>
   </ul>
-
   <div id="table" class="table-editable">
     <span class="table-add glyphicon glyphicon-plus"></span>
     <table class="table">
@@ -103,6 +105,9 @@
   <button id="import-btn" class="btn btn-primary">Import Data</button>
   <p id="export"></p>
 </div>
+<script>
+let jsonData = {};
+</script>
 <script src="./js/index.js"></script>
 </body>
 </html>

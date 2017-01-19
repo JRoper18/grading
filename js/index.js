@@ -2,6 +2,9 @@ var $TABLE = $('#table');
 var $BTN = $('#export-btn');
 var $EXPORT = $('#export');
 
+$('table').click(function(){
+	refreshEverything();
+})
 $('.table-add').click(function() {
 	var $clone = $TABLE.find('tr.hide').clone(true).removeClass('hide table-line');
 	$TABLE.find('table').append($clone);
@@ -27,6 +30,38 @@ jQuery.fn.pop = [].pop;
 jQuery.fn.shift = [].shift;
 
 $BTN.click(function() {
+	refreshEverything();
+});
+function refreshEverything(){
+		jsonData = getJSON();
+		$("#gpa-txt").html(getGPA());
+		$EXPORT.text(JSON.stringify(jsonData));
+}
+function getGPA(){
+	let sum = 0;
+	for (let i = 0; i < jsonData.length; i++) {
+		const letterGrade = jsonData[i]["grade"];
+		let base;
+		switch(letterGrade){
+			case "A":
+				base = 4;
+				break;
+			case "HA":
+				base = 5;
+				break;
+			case "P":
+				base = 3;
+				break;
+			case "PP":
+				base = 2;
+				break;
+		}
+		const final = (jsonData[i]["honors"]) ? base+0.5 : base ;
+		sum += final;
+	}
+	return Math.round(sum / jsonData.length * 100) / 100 //Rounded
+}
+function getJSON() {
 	var $rows = $TABLE.find('tr:not(:hidden)');
 	var headers = [];
 	var data = [];
@@ -51,8 +86,8 @@ $BTN.click(function() {
 	});
 
 	// Output the result
-	$EXPORT.text(JSON.stringify(data));
-});
+	return data;
+}
 
 function getVal(data, whichColumn) {
 	switch (whichColumn) {
@@ -61,7 +96,7 @@ function getVal(data, whichColumn) {
 		case 1: //Grade
 			return data.find('.dropdown').find('.dropdown-btn').text().trim();
 		case 2: //Honors
-			return data.find("input").attr("checked") == "checked";
+			return (data.find("input").is(":checked"));
 		case 3: //Units Earned
 			return parseFloat(data.find(".numValue").text());
 		default:
@@ -76,4 +111,12 @@ $(".grade-option").click(function() {
 
 function rangeRefresh(row, newValue) {
 	row.html(newValue);
+}
+
+function importFromJSON(json){
+	$("trbody").append("<tr><th>Course Name</th><th>Grade</th><th>Honors</th><th>Units Earned</th><th></th><th></th></tr>"); //Headers
+	for(let i = 0; i<json.length; i++){
+		const courseName = json[i]["course name"];
+		$("trbody").append(`<td contenteditable="true">${courseName}</td>`)
+	}
 }
