@@ -581,7 +581,6 @@
             }
             options.paramName = this._getParamName(options);
             if (!options.url) {
-                console.log(location);
                 options.url = options.form.prop('action') || location.href;
             }
             // The HTTP request method must be "POST" or "PUT":

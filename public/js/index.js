@@ -62,12 +62,15 @@ function getGPA(){
 	}
 	return Math.round(sum / jsonData.length * 100) / 100 //Rounded
 }
+
 $('#import-btn').fileupload({
-        dataType: 'json',
-        done: function (e, data) {
-            console.log(data);
-        }
-    });
+		dataType: 'json',
+		done: function (e, data) {
+				$.each(data.result.files, function (index, file) {
+						$('<p/>').text(file.name).appendTo('#files');
+				});
+		}
+	})
 function getJSON() {
 	var $rows = $TABLE.find('tr:not(:hidden)');
 	var headers = [];
@@ -152,6 +155,7 @@ function makeRowString(name, grade, honors, ue){
 		</td>`);
 }
 function importFromJSON(json){
+	console.log(json);
 	$("trbody").html(" 	"); //Clear the table
 	$("trbody").append("<tr><th>Course Name</th><th>Grade</th><th>Honors</th><th>Units Earned</th><th></th><th></th></tr>"); //Headers
 	for(let i = 0; i<json.length; i++){
