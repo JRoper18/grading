@@ -1,0 +1,19 @@
+{
+  "name": "grading",
+  "version": "1.0.0",
+  "description": "A Pen created at CodePen.io. You can find this one at http://codepen.io/anon/pen/RKKpLO.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JRoper18/grading.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JRoper18/grading/issues"
+  },
+  "homepage": "https://github.com/JRoper18/grading#readme"
+}

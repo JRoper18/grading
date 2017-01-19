@@ -31,3 +31,6 @@
 .table-add:hover {
   color: #0b0;
 }
+select{
+  float: left;
+}
