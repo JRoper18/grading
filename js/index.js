@@ -1,47 +1,60 @@
-var $TABLE = $('#table');
-var $BTN = $('#export-btn');
-var $EXPORT = $('#export');
-
-$('table').click(function(){
-	refreshEverything();
-})
-$('.table-add').click(function() {
-	var $clone = $TABLE.find('tr.hide').clone(true).removeClass('hide table-line');
-	$TABLE.find('table').append($clone);
-});
-
-$('.table-remove').click(function() {
-	$(this).parents('tr').detach();
-});
-
-$('.table-up').click(function() {
-	var $row = $(this).parents('tr');
-	if ($row.index() === 1) return; // Don't go above the header
-	$row.prev().before($row.get(0));
-});
-
-$('.table-down').click(function() {
-	var $row = $(this).parents('tr');
-	$row.next().after($row.get(0));
-});
-
-
-// A few jQuery helpers for exporting only
-jQuery.fn.pop = [].pop;
-jQuery.fn.shift = [].shift;
-
-$BTN.click(function() {
-	$.ajax({
-		'url': 'save',
-	  'type': 'POST',
-	  'data': JSON.stringify(getJSON()),
-		'contentType': "application/json",
-		'dataType': 'json'
+var $TABLE;
+var $BTN;
+var $EXPORT;
+function addListeners(){
+	$TABLE = $('#table');
+	$BTN = $('#export-btn');
+	$EXPORT = $('#export');
+	$('table').click(function(){
+		refreshEverything();
+	})
+	$('.table-add').click(function() {
+		var $clone = $TABLE.find('tr.hide').clone(true).removeClass('hide table-line');
+		$TABLE.find('table').append($clone);
 	});
-});
+
+	$('.table-remove').click(function() {
+		$(this).parents('tr').detach();
+	});
+
+	$('.table-up').click(function() {
+		var $row = $(this).parents('tr');
+		if ($row.index() === 1) return; // Don't go above the header
+		$row.prev().before($row.get(0));
+	});
+
+	$('.table-down').click(function() {
+		var $row = $(this).parents('tr');
+		$row.next().after($row.get(0));
+	});
+
+
+	// A few jQuery helpers for exporting only
+	jQuery.fn.pop = [].pop;
+	jQuery.fn.shift = [].shift;
+
+	$BTN.click(function() {
+		$.ajax({
+			'url': 'save',
+		  'type': 'POST',
+		  'data': JSON.stringify(getJSON()),
+			'contentType': "application/json",
+			'dataType': 'json'
+		});
+	});
+
+	$('#import-btn').on('change', {
+	}, readFile)
+	$(".grade-option").click(function() {
+		const newDisplay = $(this)[0].innerHTML;
+		const div = $(this).parent().parent().parent();
+		div.find(".dropdown-btn").html(newDisplay + ' <span class="caret"></span>');
+	})
+}
 function refreshEverything(){
 		jsonData = getJSON();
 		$("#gpa-txt").html(getGPA());
+		addListeners();
 }
 function getGPA(){
 	let sum = 0;
@@ -69,8 +82,6 @@ function getGPA(){
 	return (gpa == 0) ? "GPA" : gpa ;
 }
 
-$('#import-btn').on('change', {
-}, readFile)
 function getJSON() {
 	var $rows = $TABLE.find('tr:not(:hidden)');
 	var headers = [];
@@ -121,12 +132,6 @@ function getVal(data, whichColumn) {
 			return "DEFAULT";
 	}
 }
-$(".grade-option").click(function() {
-	const newDisplay = $(this)[0].innerHTML;
-	const div = $(this).parent().parent().parent();
-	div.find(".dropdown-btn").html(newDisplay + ' <span class="caret"></span>');
-})
-
 function rangeRefresh(row, newValue) {
 	row.html(newValue);
 }
@@ -152,7 +157,7 @@ function makeRowString(name, grade, honors, ue){
 			<div class="numValue">
 				${ue}
 			</div>
-			<input type="range" min="0" max="1.5" step="0.5" onchange="rangeRefresh($(this).parent().find('.numValue'), this.value);" />
+			<input type="range" min="0" max="1.5" step="0.5" value="${ue}" onchange="rangeRefresh($(this).parent().find('.numValue'), this.value);" />
 		</td>
 		<td>
 			<span class="table-remove glyphicon glyphicon-remove"></span>
@@ -171,5 +176,9 @@ function importFromJSON(jsonStr){
 	}
 	//Add the empty row.
 	$("tbody").append("<tr class='hide'>" + makeRowString("Course Name","Grade",true,1) + "</tr>");
-
+	refreshEverything();
 }
+
+$(document).ready(function(){
+	addListeners();
+})

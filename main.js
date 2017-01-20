@@ -12,7 +12,7 @@ function createWindow () {
   win = new BrowserWindow({width: 1400, height: 900})
 
   // and load the index.html of the app.
-  //win.loadURL(`http://localhost:8000/index.html`);
+  win.loadURL(`http://localhost:8000/index.html`);
   win.focus();
 
   //Uncomment for DevTools.

@@ -1,14 +1,16 @@
 {
   "name": "grading",
   "version": "1.0.0",
-  "description": "",
+  "description": "Transcript opening and editing app for UHS",
   "main": "main.js",
   "dependencies": {
     "body-parser": "^1.16.0",
     "electron-packager": "^8.5.0",
     "express": "^4.14.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "electron" : "^1.4.14"
+  },
   "scripts": {
     "package": "electron-packager ./ -all --version=1.4.14",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -22,5 +24,14 @@
   "bugs": {
     "url": "https://github.com/JRoper18/grading/issues"
   },
-  "homepage": "https://github.com/JRoper18/grading#readme"
+  "homepage": "https://github.com/JRoper18/grading#readme",
+  "build": {
+    "appId": "your.id",
+    "mac": {
+      "category": "utility"
+    },
+    "win": {
+      "iconUrl": "(windows-only) https link to icon"
+    }
+  }
 }
