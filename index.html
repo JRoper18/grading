@@ -1,25 +1,24 @@
 <!DOCTYPE html>
-<html >
+<html>
 <head>
   <meta charset="UTF-8">
   <title>HTML5 Editable Table</title>
 
 
-    <link rel='stylesheet prefetch' href='https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css'>
-    <link rel='stylesheet prefetch' href='https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css'>
-    <link rel="stylesheet" href="css/style.css">
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
-    <script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js'></script>
-    <script src='https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js'></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore.js'></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore.js"></script>
-    <script src="./js/file-input.js"></script>
+  <link rel='stylesheet prefetch' href='css/jquery-ui.min.css'>
+  <link rel='stylesheet prefetch' href='css/bootstrap.min.css'>
+  <link rel="stylesheet" href="css/style.css">
+  <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+  <script src='js/libary/jquery-3.1.1.min.js'></script>
+  <script src='js/libary/jquery-ui.min.js'></script>
+  <script src='js/libary/bootstrap.min.js'></script>
+  <script src='js/libary/underscore.js'></script>
+  <script>if (window.module) module = window.module;</script>
 </head>
 
 <body>
   <div id="gpa">
-    <h1 id=gpa-txt></h1>
+    <h1 id=gpa-txt>GPA</h1>
   </div>
   <div class="container">
   <h1>Transcript Editor</h1>
@@ -102,15 +101,15 @@
       </tr>
     </table>
   </div>
-  <button id="export-btn" class="btn btn-primary">Export Data</button>
+  <button id="export-btn" class="btn btn-primary">Save Transcript</button>
   <label class="btn btn-default btn-file">
-    Import Data <input id="import-btn" type="file" class="hidden">
+    Open Transcript <input id="import-btn" type="file" class="hidden">
   </label>
   <p id="export"></p>
 </div>
 <script>
 let jsonData = {};
 </script>
-<script src="./js/index.js"></script>
+<script src="js/index.js"></script>
 </body>
 </html>

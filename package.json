@@ -1,0 +1,26 @@
+{
+  "name": "grading",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "dependencies": {
+    "body-parser": "^1.16.0",
+    "electron-packager": "^8.5.0",
+    "express": "^4.14.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "package": "electron-packager ./ -all --version=1.4.14",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JRoper18/grading.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JRoper18/grading/issues"
+  },
+  "homepage": "https://github.com/JRoper18/grading#readme"
+}

@@ -31,12 +31,17 @@ jQuery.fn.pop = [].pop;
 jQuery.fn.shift = [].shift;
 
 $BTN.click(function() {
-	refreshEverything();
+	$.ajax({
+		'url': 'save',
+	  'type': 'POST',
+	  'data': JSON.stringify(getJSON()),
+		'contentType': "application/json",
+		'dataType': 'json'
+	});
 });
 function refreshEverything(){
 		jsonData = getJSON();
 		$("#gpa-txt").html(getGPA());
-		$EXPORT.text(JSON.stringify(jsonData));
 }
 function getGPA(){
 	let sum = 0;
@@ -60,17 +65,12 @@ function getGPA(){
 		const final = (jsonData[i]["honors"]) ? base+0.5 : base ;
 		sum += final;
 	}
-	return Math.round(sum / jsonData.length * 100) / 100 //Rounded
+	const gpa = Math.round(sum / jsonData.length * 100) / 100 //Rounded
+	return (gpa == 0) ? "GPA" : gpa ;
 }
 
-$('#import-btn').fileupload({
-		dataType: 'json',
-		done: function (e, data) {
-				$.each(data.result.files, function (index, file) {
-						$('<p/>').text(file.name).appendTo('#files');
-				});
-		}
-	})
+$('#import-btn').on('change', {
+}, readFile)
 function getJSON() {
 	var $rows = $TABLE.find('tr:not(:hidden)');
 	var headers = [];
@@ -98,7 +98,15 @@ function getJSON() {
 	// Output the result
 	return data;
 }
-
+function readFile (evt) {
+		var files = evt.target.files;
+		var file = files[0];
+		var reader = new FileReader();
+		reader.onload = function() {
+			importFromJSON(this.result);
+		}
+		reader.readAsText(file)
+ }
 function getVal(data, whichColumn) {
 	switch (whichColumn) {
 		case 0: //Course name
@@ -154,14 +162,14 @@ function makeRowString(name, grade, honors, ue){
 			<span class="table-down glyphicon glyphicon-arrow-down"></span>
 		</td>`);
 }
-function importFromJSON(json){
-	console.log(json);
-	$("trbody").html(" 	"); //Clear the table
-	$("trbody").append("<tr><th>Course Name</th><th>Grade</th><th>Honors</th><th>Units Earned</th><th></th><th></th></tr>"); //Headers
+function importFromJSON(jsonStr){
+	const json = JSON.parse(jsonStr);
+	$("tbody").empty(); //Clear the table
+	$("tbody").append("<tr><th>Course Name</th><th>Grade</th><th>Honors</th><th>Units Earned</th><th></th><th></th></tr>"); //Headers
 	for(let i = 0; i<json.length; i++){
-		$("trbody").append(makeRowString(json[i]["courseName"],json[i]["grade"],json[i]["honors"],json[i]["units earned"]));
+		$("tbody").append("<tr>" + makeRowString(json[i]["course name"],json[i]["grade"],json[i]["honors"],json[i]["units earned"]) + "</tr>");
 	}
 	//Add the empty row.
-	$("trbody").append(makeRowString("Course Name","Grade",true,1));
+	$("tbody").append("<tr class='hide'>" + makeRowString("Course Name","Grade",true,1) + "</tr>");
 
 }
