@@ -5,11 +5,13 @@
   "main": "main.js",
   "dependencies": {
     "body-parser": "^1.16.0",
+    "docxtemplater": "^3.0.2",
     "electron-packager": "^8.5.0",
-    "express": "^4.14.0"
+    "express": "^4.14.0",
+    "jszip": "^2.6.1"
   },
   "devDependencies": {
-    "electron" : "^1.4.14"
+    "electron": "^1.4.14"
   },
   "scripts": {
     "package": "electron-packager ./ -all --version=1.4.14",

@@ -2,9 +2,9 @@ var $TABLE;
 var $BTN;
 var $EXPORT;
 function addListeners(){
-	$TABLE = $('#table');
-	$BTN = $('#export-btn');
-	$EXPORT = $('#export');
+  $TABLE = $('#table');
+  $BTN = $('#export-btn');
+  $EXPORT = $('#export');
 	$('table').click(function(){
 		refreshEverything();
 	})
@@ -28,11 +28,6 @@ function addListeners(){
 		$row.next().after($row.get(0));
 	});
 
-
-	// A few jQuery helpers for exporting only
-	jQuery.fn.pop = [].pop;
-	jQuery.fn.shift = [].shift;
-
 	$BTN.click(function() {
 		$.ajax({
 			'url': 'save',
@@ -54,11 +49,14 @@ function addListeners(){
 function refreshEverything(){
 		jsonData = getJSON();
 		$("#gpa-txt").html(getGPA());
-		addListeners();
+		refreshListeners();
 }
 function getGPA(){
 	let sum = 0;
 	for (let i = 0; i < jsonData.length; i++) {
+    if(jsonData[i]["units earned"] == 0){
+      continue;
+    }
 		const letterGrade = jsonData[i]["grade"];
 		let base;
 		switch(letterGrade){
@@ -75,7 +73,7 @@ function getGPA(){
 				base = 2;
 				break;
 		}
-		const final = (jsonData[i]["honors"]) ? base+0.5 : base ;
+		const final = base + (jsonData[i]["extra"]);
 		sum += final;
 	}
 	const gpa = Math.round(sum / jsonData.length * 100) / 100 //Rounded
@@ -125,7 +123,7 @@ function getVal(data, whichColumn) {
 		case 1: //Grade
 			return data.find('.dropdown').find('.dropdown-btn').text().trim();
 		case 2: //Honors
-			return (data.find("input").is(":checked"));
+      return extraStrToNum(data.find('.dropdown').find('.dropdown-btn').text().trim());
 		case 3: //Units Earned
 			return parseFloat(data.find(".numValue").text());
 		default:
@@ -135,7 +133,32 @@ function getVal(data, whichColumn) {
 function rangeRefresh(row, newValue) {
 	row.html(newValue);
 }
-function makeRowString(name, grade, honors, ue){
+function extraStrToNum(str){
+  switch (str) {
+    case "Normal":
+        return 0;
+    case "Honors":
+      return 0.5;
+    case "AP":
+      return 1;
+    default:
+
+  }
+}
+function extraToStr(num){
+  switch(parseFloat(num)){
+    case 0:
+      return "Normal";
+    case 0.5:
+      return "Honors";
+    case 1:
+      return "AP";
+    default:
+      console.log("We have an error: Invalid extra points");
+      return num;
+  }
+}
+function makeRowString(name, grade, extra, ue){
 	return (`
 		<td contenteditable="true">${name}</td>
 		<td>
@@ -152,7 +175,19 @@ function makeRowString(name, grade, honors, ue){
 				</ul>
 			</div>
 		</td>
-		<td><input type="checkbox" checked="${honors}"/></td>
+		<td>
+      <div class="dropdown">
+        <button class="dropdown-btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          ${extraToStr(extra)}
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dLabel">
+          <li><a class = "grade-option" href="#">Normal</a></li>
+          <li><a class = "grade-option" href="#">Honors</a></li>
+          <li><a class = "grade-option" href="#">AP</a></li>
+        </ul>
+      </div>
+    </td>
 		<td>
 			<div class="numValue">
 				${ue}
@@ -167,18 +202,34 @@ function makeRowString(name, grade, honors, ue){
 			<span class="table-down glyphicon glyphicon-arrow-down"></span>
 		</td>`);
 }
+function refreshListeners(){
+  $("*").unbind();
+  addListeners();
+}
 function importFromJSON(jsonStr){
 	const json = JSON.parse(jsonStr);
 	$("tbody").empty(); //Clear the table
-	$("tbody").append("<tr><th>Course Name</th><th>Grade</th><th>Honors</th><th>Units Earned</th><th></th><th></th></tr>"); //Headers
+	$("tbody").append("<tr><th>Course Name</th><th>Grade</th><th>Extra</th><th>Units Earned</th><th></th><th></th></tr>"); //Headers
 	for(let i = 0; i<json.length; i++){
-		$("tbody").append("<tr>" + makeRowString(json[i]["course name"],json[i]["grade"],json[i]["honors"],json[i]["units earned"]) + "</tr>");
+		$("tbody").append("<tr>" + makeRowString(json[i]["course name"],json[i]["grade"],json[i]["extra"],json[i]["units earned"]) + "</tr>");
 	}
 	//Add the empty row.
-	$("tbody").append("<tr class='hide'>" + makeRowString("Course Name","Grade",true,1) + "</tr>");
+	$("tbody").append("<tr class='hide'>" + makeRowString("Course Name","Grade",0,1) + "</tr>");
 	refreshEverything();
 }
 
 $(document).ready(function(){
+  $TABLE = $('#table');
+  $BTN = $('#export-btn');
+  $EXPORT = $('#export');
+  // A few jQuery helpers for exporting only
+  jQuery.fn.pop = [].pop;
+  jQuery.fn.shift = [].shift;
+  importFromJSON(`[{
+    "extra": 0,
+    "course name" : "Course Name",
+    "grade": "Grade",
+    "units earned": 1
+  }]`);
 	addListeners();
 })
