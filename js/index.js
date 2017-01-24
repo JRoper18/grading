@@ -40,6 +40,8 @@ function addListeners(){
 
 	$('#import-btn').on('change', {
 	}, readFile)
+  $('#import-word-btn').on('change', {
+	}, readFile)
 	$(".grade-option").click(function() {
 		const newDisplay = $(this)[0].innerHTML;
 		const div = $(this).parent().parent().parent();
