@@ -37,10 +37,18 @@ function addListeners(){
 			'dataType': 'json'
 		});
 	});
+  $('#import-word-btn').click(function(){
+    $.ajax({
+      'url': 'import-word',
+      'type': 'POST',
+      success: function (data) {
+         importFromJSON(JSON.stringify(data));
+       },
+       'dataType': "json"
+    });
+  });
 
 	$('#import-btn').on('change', {
-	}, readFile)
-  $('#import-word-btn').on('change', {
 	}, readFile)
 	$(".grade-option").click(function() {
 		const newDisplay = $(this)[0].innerHTML;
@@ -53,32 +61,32 @@ function refreshEverything(){
 		$("#gpa-txt").html(getGPA());
 		refreshListeners();
 }
+function gradeToLetter(num){
+  switch(num){
+    case 2:
+      return "PP";
+    case 3:
+      return "P";
+    case 4:
+      return "A";
+    case 5:
+      return "HA";
+    default:
+      return "Grade";
+  }
+}
 function getGPA(){
 	let sum = 0;
 	for (let i = 0; i < jsonData.length; i++) {
     if(jsonData[i]["units earned"] == 0){
       continue;
     }
-		const letterGrade = jsonData[i]["grade"];
-		let base;
-		switch(letterGrade){
-			case "A":
-				base = 4;
-				break;
-			case "HA":
-				base = 5;
-				break;
-			case "P":
-				base = 3;
-				break;
-			case "PP":
-				base = 2;
-				break;
-		}
+		const base = jsonData[i]["grade"];
 		const final = base + (jsonData[i]["extra"]);
 		sum += final;
 	}
 	const gpa = Math.round(sum / jsonData.length * 100) / 100 //Rounded
+  console.log(gpa);
 	return (gpa == 0) ? "GPA" : gpa ;
 }
 
@@ -118,12 +126,24 @@ function readFile (evt) {
 		}
 		reader.readAsText(file)
  }
+function letterGradeToNum(str){
+  switch(str){
+    case "PP":
+      return 2;
+    case "P":
+      return 3;
+    case "A":
+      return 4;
+    case "HA":
+      return 5;
+  }
+}
 function getVal(data, whichColumn) {
 	switch (whichColumn) {
 		case 0: //Course name
 			return data.text();
 		case 1: //Grade
-			return data.find('.dropdown').find('.dropdown-btn').text().trim();
+			return letterGradeToNum(data.find('.dropdown').find('.dropdown-btn').text().trim());
 		case 2: //Honors
       return extraStrToNum(data.find('.dropdown').find('.dropdown-btn').text().trim());
 		case 3: //Units Earned
@@ -166,7 +186,7 @@ function makeRowString(name, grade, extra, ue){
 		<td>
 			<div class="dropdown">
 				<button class="dropdown-btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					${grade}
+					${gradeToLetter(grade)}
 					<span class="caret"></span>
 				</button>
 				<ul class="dropdown-menu" aria-labelledby="dLabel">

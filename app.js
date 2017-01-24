@@ -18,7 +18,17 @@ app.post("/export-word", function(req, res){
   //Do later
 })
 app.post("/import-word", function(req, res){
-  
+  console.log("Y")
+  dialog.showOpenDialog(function(fileName){
+    if (fileName === undefined){
+         console.log("You didn't save the file");
+         return;
+    }
+    // fileName is a string that contains the path and filename created in the open file dialog.
+    wordToJSON(fileName[0]).then(function(jsonDoc){
+      res.send(jsonDoc);
+    });
+  });
 })
 app.post("/save", function(req, res){
   // You can obviously give a direct path without use the dialog (C:/Program Files/path/myfileexample.txt)
@@ -36,49 +46,55 @@ app.post("/save", function(req, res){
          });
   });
 })
-function wordToJSON(){
-  mammoth.convertToHtml({path: "./original.docx"})
-    .then(function(result){
-        var html = result.value; // The generated HTML
-        var messages = result.messages; // Any messages, such as warnings during conversion
-        const $ = cheerio.load(html);
-        const fTable = $("table").first();
-        fTable.attr("id", "gradeTable")
-        let rowNum = 0;
-        let json = [];
-        $("#gradeTable tr").each(function() {
-          rowNum++;
-          if(rowNum > 2){ //Skip the first two, they're headers
-            let columnCount = 0;
-            let currentData = {};
-            let $row = $(this);
-            $row.children().each(function() {
-              columnCount++;
-              let cellData = $(this).html();
-              if(columnCount == 2){
-                const name = $(this).find('p').html();
-                currentData["course name"] = name;
-                if(name.toLowerCase().includes("honors")){
-                  currentData["extra"] = 0.5;
-                }
-                else if(name.toLowerCase().includes("ap ")){
-                  currentData["extra"] = 1;
-                }
+function wordToJSON(inputPath){
+  return new Promise(function(resolve, reject){
+    let json = [];
+    mammoth.convertToHtml({path: inputPath})
+      .then(function(result){
+          var html = result.value; // The generated HTML
+          var messages = result.messages; // Any messages, such as warnings during conversion
+          const $ = cheerio.load(html);
+          const fTable = $("table").first();
+          fTable.attr("id", "gradeTable")
+          let rowNum = 0;
+          $("#gradeTable tr").each(function() {
+            rowNum++;
+            if(rowNum > 2){ //Skip the first two, they're headers
+              let columnCount = 0;
+              let currentData = {};
+              let $row = $(this);
+              $row.children().each(function() {
+                columnCount++;
+                let cellData = $(this).html();
+                if(columnCount == 2){
+                  const name = $(this).find('p').html();
+                  currentData["course name"] = name;
+                  if(name.toLowerCase().includes("honors")){
+                    currentData["extra"] = 0.5;
+                  }
+                  else if(name.toLowerCase().includes("ap ")){
+                    currentData["extra"] = 1;
+                  }
+                  else{
+                    currentData["extra"] = 0;
+                  }
 
-              }
-              else if(columnCount == 3){ //Units earned
-                currentData["units earned"] = parseFloat($(this).find('p').html());
-              }
-              if(columnCount > 3){
-                if($(this).children().length > 0 ) { //Look for text in one of the grade boxes.
-                  currentData["grade"] = columnCount - 2;
                 }
-              }
-            });
-            json.push(currentData);
-          }
-        });
-        console.log(json);
-    })
-    .done();
+                else if(columnCount == 3){ //Units earned
+                  currentData["units earned"] = parseFloat($(this).find('p').html());
+                }
+                if(columnCount > 3){
+                  if($(this).children().length > 0 ) { //Look for text in one of the grade boxes.
+                    currentData["grade"] = columnCount - 2;
+                  }
+                }
+              });
+              json.push(currentData);
+            }
+          });
+      })
+      .done(function(){
+        resolve(json);
+      });
+    });
 }
