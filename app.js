@@ -6,6 +6,9 @@ var fs = require('fs'); // Load the File System
 var officegen = require('officegen');
 var mammoth = require('mammoth');
 var cheerio = require('cheerio');
+var cheerioAdv = require('cheerio-advanced-selectors')
+
+cheerio = cheerioAdv.wrap(cheerio);
 
 app.use(bodyParser.json())
 app.use(express.static(__dirname))
@@ -18,7 +21,6 @@ app.post("/export-word", function(req, res){
   //Do later
 })
 app.post("/import-word", function(req, res){
-  console.log("Y")
   dialog.showOpenDialog(function(fileName){
     if (fileName === undefined){
          console.log("You didn't save the file");
@@ -91,6 +93,41 @@ function wordToJSON(inputPath){
               });
               json.push(currentData);
             }
+          });
+          let count = 0;
+          $("table").eq(1).children().each(function(){
+              let currentData = {};
+              if(count == 0){
+                //SKIP
+              }
+              else{
+                let $row = $(this);
+                currentData["extra"] = 0;
+                currentData["units earned"] = parseFloat($row.children().eq(1).find('p').html());
+                currentData["course name"] = (count == 1) ? $row.children().eq(0).find('h6').html() : $row.children().eq(0).find('strong').html()
+                let letterGrade = $row.children().eq(2).find('p').html();
+                let numberGrade; 
+                switch(letterGrade){
+                  case "A":
+                    numberGrade = 4;
+                    break;
+                  case "B":
+                    numberGrade = 3;
+                    break;
+                  case "C":
+                    numberGrade = 2;
+                    break;
+                  case "D":
+                    numberGrade = 1;
+                    break;
+                }
+                currentData["grade"] = numberGrade;
+                if(currentData["course name"] == null){
+                  currentData["course name"] = "Course Name";
+                }
+                json.push(currentData);   
+              }  
+              count++;                   
           });
       })
       .done(function(){

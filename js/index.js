@@ -37,7 +37,8 @@ function addListeners(){
 			'dataType': 'json'
 		});
 	});
-  $('#import-word-btn').click(function(){
+  $('#import-word-btn').unbind("click").click(function(event){	
+  	alert("CLICK");
     $.ajax({
       'url': 'import-word',
       'type': 'POST',
