@@ -2,6 +2,8 @@ var express = require('express')
 var app = express()
 const {dialog} = require('electron')
 var bodyParser = require('body-parser')
+var async = require ( 'async' );
+var path = require('path');
 var fs = require('fs'); // Load the File System
 var officegen = require('officegen');
 var mammoth = require('mammoth');
@@ -13,6 +15,7 @@ cheerio = cheerioAdv.wrap(cheerio);
 app.use(bodyParser.json())
 app.use(express.static(__dirname))
 
+/*
 app.listen(8000, function () {
   console.log("Server is up");
 })
@@ -135,3 +138,75 @@ function wordToJSON(inputPath){
       });
     });
 }
+*/
+
+var studentData = {
+  "name": "Jack Roper",
+  "gradDate": "2018",
+  "dob": "09/18/01",
+  "id": "178225",
+  "gpa": 4.0
+}
+function generateWordDoc(){
+  var docx = officegen ( {
+    type: 'docx',
+    orientation: 'portrait'
+  } );  
+  var pObj = docx.createP({
+    align: 'center'
+  });
+  pObj.addImage(path.resolve(__dirname, 'images/svvsd.png' ), {cx: 200, cy: 100} );
+  var pObj = docx.createP({
+    align: 'center'
+  });
+  pObj.addText('UNIVERSAL HIGH SCHOOL PROGRAM', {font_face: 'Times New Roman', bold: true, font_size: 14});
+  var pObj = docx.createP({
+    align: 'center'
+  });
+  pObj.addText('Official Transcript, Part I', {font_face: 'Times New Roman', bold: true, font_size: 14, underline: true});
+  var pObj = docx.createP({
+  });
+  pObj.addText('Student Name: ' + studentData.name + " Graduation Date: " + studentData.gradDate, {bold: true, font_face: 'Times New Roman', font_size: 12});
+  pObj.addLineBreak();
+  pObj.addText('DOB: ' + studentData.dob + " Student ID: " + studentData.id,  {bold: true, font_face: 'Times New Roman', font_size: 12});
+  pObj.addLineBreak();
+  pObj.addText('Signature of Registar:_______________ *GPA Equivalency:' + studentData.gpa,  {bold: true, font_face: 'Times New Roman', font_size: 12});
+  var pObj = docx.createP({
+  });
+  pObj.addText('The following Learning Units are acquired through both traditional coursework and nontraditional learning experiences.  Level of proficiency is based on final products, performances or assessments.', {font_face: 'Times New Roman', font_size: 10})
+  var pObj = docx.createP({
+  });
+  pObj.addText('*Universal HS students do not earn a traditional GPA, nor are they ranked in comparison to other students.  An Equivalency GPA is calculated based on levels of proficiency for Learning Units, combined with courses grades in elective areas (Parts A and D).  See Program Profile for further information.', {bold: true, font_face: 'Times New Roman', font_size: 9})
+
+
+
+
+
+
+
+  var out = fs.createWriteStream ( './out.docx' );
+
+  out.on ( 'error', function ( err ) {
+    console.log ( err );
+  });
+
+  async.parallel ([
+    function ( done ) {
+      out.on ( 'close', function () {
+        console.log ( 'Finish to create a DOCX file.' );
+        done ( null );
+      });
+      docx.generate ( out );
+    }
+
+  ], function ( err ) {
+    if ( err ) {
+      console.log ( 'error: ' + err );
+    } // Endif.
+  });
+
+}
+
+generateWordDoc();
+
+
